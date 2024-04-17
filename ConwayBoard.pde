@@ -46,7 +46,7 @@ public class ConwayBoard {
   public ConwayBoard updateBoard() {
     int cellCount;
     int applicableRow;
-    int applicableCollum;
+    int applicableColumn;
     for (int i = 0; i < size; i++) {
       for (int j = 0; j < size; j++) {
         cellCount = 0;
@@ -54,13 +54,13 @@ public class ConwayBoard {
           for (int y = -1; y <= 1; y++) {
             if (x == 0 && y == 0) continue;
             applicableRow = i + y;
-            applicableCollum = j + x;
+            applicableColumn = j + x;
             if (i + y < 0) applicableRow = size - 1;
-            if (j + x < 0) applicableCollum = size - 1;
+            if (j + x < 0) applicableColumn = size - 1;
             if (i + y >= size) applicableRow = 0;
-            if (j + x >= size) applicableCollum = 0;
+            if (j + x >= size) applicableColumn = 0;
             
-            if (board[applicableRow][applicableCollum]) cellCount++;
+            if (board[applicableRow][applicableColumn]) cellCount++;
             if (cellCount > 3) {
               machBoard[i][j] = false;
               continue;
