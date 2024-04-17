@@ -1,55 +1,143 @@
-int frame = 0;
-int camFrame = 0;
-ArrayList<ConwayBoard> tower = new ArrayList<ConwayBoard>();
+import java.util.*;
 
-public void setup() {
-  //boolean[][] board = {{false, false, false, false, false}, 
-  //                      {true, false, false, false, false}, 
-  //                      {true, false, false, false, false}, 
-  //                      {true, false, false, false, false}, 
-  //                      {false, false, false, false, false}};
+public class ConwayBoard {
+  public boolean[][] board;
+  public boolean[][] machBoard;
+  public int size;
+  public int boardHeight;
   
-  int[][] board = {{0, 0, 0, 0, 0, 0, 0, 0, 0}, 
-                   {0, 0, 0, 0, 0, 0, 0, 0, 0}, 
-                   {0, 0, 1, 1, 0, 0, 0, 0, 0}, 
-                   {1, 0, 0, 0, 0, 1, 0, 0, 0}, 
-                   {0, 0, 0, 0, 0, 0, 1, 0, 0}, 
-                   {1, 0, 0, 0, 0, 0, 1, 0, 0}, 
-                   {0, 1, 1, 1, 1, 1, 1, 0, 0}, 
-                   {0, 0, 0, 0, 0, 0, 0, 0, 0}, 
-                   {0, 0, 0, 0, 0, 0, 0, 0, 0}};
-  
-  size(900, 900, P3D);
-  background(0);
-  tower.add(new ConwayBoard(20));
-  // tower.add(new ConwayBoard(board));
-  frameRate(100);
-  noStroke();
-  spotLight(90, 45, 130, -250, 100, 250, 0, 0, -1, 2 * PI, 500); 
-}
-
-public void draw() {
-  frame++;
-  background(0);
-  
-  // pointLight(50, 100, 130, -320, 80, -260); // blue
-  // pointLight(20, 20, 130, -320, 80, -260); // dark blue
-  // pointLight(50, 200, 130, -320, 180, -260); // emerald
-  pointLight(190, 150, 255, -320, 180, -260); // magenta
-  
-  lightSpecular(0, 0, 0);
-  // directionalLight(110, 200, 255, 1, -2, -1); // light blue highlight
-  // directionalLight(180, 140, 245, 1, -2, -1); // magenta highlight
-  
-  camera(-250, 200, -250, 0, 0, 0, 0, -1, 0);
-  
-  for (ConwayBoard cb : tower) {
-    cb.show();
-    cb.boardHeight--;
+  public ConwayBoard(int s) {
+    board = new boolean[s][s];
+    machBoard = new boolean[s][s];
+    size = s;
+    boardHeight = 0;
+    int rand;
+    
+    for (int i = 0; i < size; i++) {
+      for (int j = 0; j < size; j++) {
+        rand = (int) (Math.random() * 2);
+        if (rand == 1) board[i][j] = true;
+        else board[i][j] = false;
+      }
+    }
   }
   
-  if (frame % 10 == 0) {
-    if (tower.size() > 80) tower.remove(0);
-    tower.add(tower.get(tower.size() - 1).updateBoard());
+  public ConwayBoard(boolean[][] b) {
+    board = b;
+    machBoard = new boolean[b.length][b.length];
+    size = b.length;
+    boardHeight = 0;
+  }
+  
+  public ConwayBoard(int[][] b) {
+    board = new boolean[b.length][b.length];
+    machBoard = new boolean[b.length][b.length];
+    size = b.length;
+    boardHeight = 0;
+    
+    for (int i = 0; i < size; i++) {
+      for (int j = 0; j < size; j++) {
+        if (b[i][j] == 1) board[i][j] = true;
+        else board[i][j] = false;
+      }
+    }
+  }
+  
+  public ConwayBoard updateBoard() {
+    int cellCount;
+    int applicableRow;
+    int applicableCollum;
+    for (int i = 0; i < size; i++) {
+      for (int j = 0; j < size; j++) {
+        cellCount = 0;
+        for (int x = -1; x <= 1; x++) {
+          for (int y = -1; y <= 1; y++) {
+            if (x == 0 && y == 0) continue;
+            applicableRow = i + y;
+            applicableCollum = j + x;
+            if (i + y < 0) applicableRow = size - 1;
+            if (j + x < 0) applicableCollum = size - 1;
+            if (i + y >= size) applicableRow = 0;
+            if (j + x >= size) applicableCollum = 0;
+            
+            if (board[applicableRow][applicableCollum]) cellCount++;
+            if (cellCount > 3) {
+              machBoard[i][j] = false;
+              continue;
+            }
+          }
+        }
+        if (board[i][j] && !(cellCount == 2 || cellCount == 3)) machBoard[i][j] = false;
+        else if (!board[i][j] && cellCount == 3) machBoard[i][j] = true;
+        else machBoard[i][j] = board[i][j];
+      }
+    }
+    
+    return new ConwayBoard(machBoard);
+    //for (int i = 0; i < size; i++) {
+    //  for (int j = 0; j < size; j++) {
+    //    board[i][j] = machBoard[i][j];
+    //  }
+    //}
+  }
+  
+  public void show() {
+    // sphereDetail(4);
+    for (int i = 0; i < size; i++) {
+      for (int j = 0; j < size; j++) {
+        pushMatrix();
+        translate(10 * (i), boardHeight, 10 * (j));
+        // if (board[i][j]) sphere(10);
+        if (board[i][j])  {
+          if (boardColor == 0) {
+            // blue and orange
+            fill(255 - (int) (((double) i / size) * 255), 
+            255 - (int) ((((double) i / 2 + (double) j / 2) / size) * 255), 
+            255 - (int) (((double) j / size) * 255));
+          }
+          
+          if (boardColor == 1) {
+            // green and purple
+            fill(255 - (int) ((((double) i / 2 + (double) j / 2) / size) * 255), 
+            255 - (int) (((double) i / size) * 255), 
+            255 - (int) (((double) j / size) * 255));
+          }
+          
+          if (boardColor == 2) {
+            // pink and green
+            fill(255 - (int) (((double) i / size) * 255), 
+            255 - (int) (((double) j / size) * 255), 
+            255 - (int) ((((double) i / 2 + (double) j / 2) / size) * 255));
+          }
+          box(10);
+        }
+        popMatrix();
+      }
+    }
+  }
+  
+  public String toString() {
+    String ret = "";
+    
+    for (int i = 0; i < board.length; i++) {
+      for (int j = 0; j < board[0].length; j++) {
+        if (board[i][j]) ret += "1";
+        else ret += "0";
+      }
+      ret += "\n";
+    }
+    
+    return ret;
+  }
+  
+  public boolean equals(ConwayBoard other) {
+    for (int i = 0; i < size; i++) {
+      for (int j = 0; j < size; j++) {
+        if (board[i][j] != other.board[i][j]) return false;
+      }
+    }
+    return true;
   }
 }
+
+// (int) (Math.random()*(Max-Min))+Min;
