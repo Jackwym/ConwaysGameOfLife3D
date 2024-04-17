@@ -89,20 +89,26 @@ public class ConwayBoard {
         translate(10 * (i), boardHeight, 10 * (j));
         // if (board[i][j]) sphere(10);
         if (board[i][j])  {
-          // blue and orange
-          //fill(255 - (int) (((double) i / size) * 255), 
-          //255 - (int) ((((double) i / 2 + (double) j / 2) / size) * 255), 
-          //255 - (int) (((double) j / size) * 255));
+          if (boardColor == 0) {
+            // blue and orange
+            fill(255 - (int) (((double) i / size) * 255), 
+            255 - (int) ((((double) i / 2 + (double) j / 2) / size) * 255), 
+            255 - (int) (((double) j / size) * 255));
+          }
           
-          // green and purple
-          //fill(255 - (int) ((((double) i / 2 + (double) j / 2) / size) * 255), 
-          //255 - (int) (((double) i / size) * 255), 
-          //255 - (int) (((double) j / size) * 255));
+          if (boardColor == 1) {
+            // green and purple
+            fill(255 - (int) ((((double) i / 2 + (double) j / 2) / size) * 255), 
+            255 - (int) (((double) i / size) * 255), 
+            255 - (int) (((double) j / size) * 255));
+          }
           
-          // pink and green
-          fill(255 - (int) (((double) i / size) * 255), 
-          255 - (int) (((double) j / size) * 255), 
-          255 - (int) ((((double) i / 2 + (double) j / 2) / size) * 255));
+          if (boardColor == 2) {
+            // pink and green
+            fill(255 - (int) (((double) i / size) * 255), 
+            255 - (int) (((double) j / size) * 255), 
+            255 - (int) ((((double) i / 2 + (double) j / 2) / size) * 255));
+          }
           box(10);
         }
         popMatrix();
@@ -122,6 +128,15 @@ public class ConwayBoard {
     }
     
     return ret;
+  }
+  
+  public boolean equals(ConwayBoard other) {
+    for (int i = 0; i < size; i++) {
+      for (int j = 0; j < size; j++) {
+        if (board[i][j] != other.board[i][j]) return false;
+      }
+    }
+    return true;
   }
 }
 
